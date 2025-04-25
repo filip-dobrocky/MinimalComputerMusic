@@ -13,7 +13,7 @@ SynthDef(\aoo_send, { |id=1, bus=0|
 // B: AOO sink with 2 channels
 (
 SynthDef(\aoo_recv, { |id=1, bus=0|
-    Out.ar(bus, AooReceive.ar(~aooPort, id))
+    Out.ar(bus, AooReceive.ar(~aooPort, id, 2))
 }).add;
 )
 
@@ -22,7 +22,7 @@ SynthDef(\aoo_recv, { |id=1, bus=0|
 // Create the destination adddress:
 
 // Note: hostnames must be resolved with AooAddr.resolve!
-~destAddr = AooAddr.resolve("255:255:255:255", ~aooPort);
+~destAddr = AooAddr.resolve("255.255.255.255", ~aooPort);
 
 ~aooBus = Bus.audio(s, 2);
 
@@ -66,4 +66,3 @@ fork {
 
 // You can pause the stream
 ~source.stop;
-
