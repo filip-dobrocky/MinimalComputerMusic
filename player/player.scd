@@ -6,13 +6,44 @@ SynthDef(\perc, { |freq = 440, amp = 1, attack = 0.01, decay = 1, out = 0|
 	Out.ar(out, sig ! 2);
 }).add;
 
-Pdefn(\scale, Scale.major);
-Pdefn(\root, 0);
-~recvPort = 55555;
 )
 
+(
+fork {
+	~playerID = 2;
+	~aooPort = 9014;
+	~client = AooClient(~aooPort);
+
+	s.sync;
+
+	~client.connect("localhost", 8000, "_", action: { |err|
+        if (err.isNil) {
+            // now join a group
+			~client.joinGroup("ensemble", "player" ++ ~playerID, "_", "_", action: {
+                |err, group, user|
+                if (err.isNil) {
+                    "successfully joined group % as user %".format(group.name, user.name).postln;
+                }
+            });
+        }
+    });
+}
+)
 
 (
+~client.addListener(\msg, { |msg, time, peer|
+    "got % message '%' from peer %".format(msg.type, msg.data, peer).postln;
+	// ~client.sendMsg(peer, ['/reply', "roger!"]);
+});
+)
+
+AooReceive
+~client.removeListener(\msg)
+
+(
+Pdefn(\scale, Scale.major);
+Pdefn(\root, 0);
+
 ~seq = [0, 5, 7, Rest(1), 2];
 
 ~pattern = Pbind(
