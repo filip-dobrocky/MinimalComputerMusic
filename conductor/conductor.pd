@@ -1,4 +1,4 @@
-#N canvas -29 54 777 546 12;
+#N canvas 18 97 777 546 12;
 #X declare -lib aoo;
 #X obj 41 51 cnv 15 181 173 empty empty Tempo 20 12 0 14 #15c982 #5a5a5a 0;
 #X obj 126 95 vsl 37 84 1 666 0 0 empty toBpm BPM 0 -9 0 12 #e3dfd9 #5a5a5a #000000 0 1;

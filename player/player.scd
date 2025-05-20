@@ -31,33 +31,23 @@ fork {
 )
 
 (
-~client.addListener(\msg, { |msg, time, peer|
-    "got % message '%' from peer %".format(msg.type, msg.data, peer).postln;
-	// ~client.sendMsg(peer, ['/reply', "roger!"]);
-});
-)
-
-AooReceive
-~client.removeListener(\msg)
-
-(
-Pdefn(\scale, Scale.major);
-Pdefn(\root, 0);
+~scale =  Scale.major;
+~root = 0;
 
 ~seq = [0, 5, 7, Rest(1), 2];
 
-~pattern = Pbind(
+~pat1 = Pdefn(\pat1, Pbind(
 	\instrument, \perc,
-	\scale, Pdefn(\scale),
-	\root, Pdefn(\root),
+	\scale, Pfunc({ ~scale }),
+	\root, Pfunc({ ~root }),
 	\octave, 4,
 	\amp, 1,
 	\degree, Pseq(~seq, inf)
-);
+));
 
-~stream = ~pattern.asStream;
+~stream = ~pat1.asStream;
 
-OSCdef(\degrees, { |msg, time|
+/*OSCdef(\degrees, { |msg, time|
 	Pdefn(\scale, Scale(msg[1..]));
 	~stream = ~pattern.asStream;
 }, "/scale/degrees", recvPort: ~recvPort);
@@ -66,17 +56,29 @@ OSCdef(\root, { |msg, time|
 	Pdefn(\root, msg[1]);
 	msg[1].postln;
 	~stream = ~pattern.asStream;
-}, "/scale/root", recvPort: ~recvPort);
+}, "/scale/root", recvPort: ~recvPort);*/
 
-OSCdef(\clock, { |msg, time|
-	var beat = msg[2];
+
+~clockEvent = { |beat, subdiv|
 	var event;
-	if (beat == 0) {
+	if (subdiv == 0) {
 		event = ~stream.next(()).play;
 	};
-
-}, "/tempo/pulse", recvPort: ~recvPort);
+};
 
 )
+
+(
+~client.addListener(\msg, { |msg, time, peer|
+	// msg.data[0].postln;
+	switch (msg.data[0])
+	{ '/clock/pulse' } { ~clockEvent.(msg.data[1], msg.data[2]); }
+	{ '/scale/root' } { ~root = msg.data[1] }
+	{ '/scale/degrees' } { ~scale = Scale(msg.data[1..]) }
+	{ };
+});
+)
+AooData
+~client.removeListener(\msg)
 
 
