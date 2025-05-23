@@ -1,16 +1,18 @@
+s.boot
+
 // example SynthDefs
 (
 SynthDef(\perc, { |freq = 440, amp = 1, attack = 0.01, decay = 1, out = 0|
 	var env, sig;
 	env = EnvGen.ar(Env.perc(attack, decay), doneAction: 2);
-	sig = amp * env * 0.3 * SinOsc.ar(freq);
+	sig = amp * env * 0.2 * SinOsc.ar(freq);
 	Out.ar(out, sig ! 2);
 }).add;
 
-SynthDef(\sustain, { |freq = 440, amp = 1, attack = 0.1, decay = 1, out = 0, timeDur = 1|
+SynthDef(\sustain, { |freq = 440, amp = 1, attack = 0.1, decay = 0.2, sustain = 0.7, release = 0.5, gate = 1, out = 0, timeDur = 1|
 	var env, sig;
-	env = EnvGen.ar(Env.linen(attack, timeDur - attack - decay, decay), doneAction: 2);
-	sig = amp * env * 0.3 * SinOsc.ar(freq);
+	env = EnvGen.ar(Env.adsr(attack, decay, sustain, release), gate, doneAction: 2);
+	sig = amp * env * 0.2 * LFTri.ar(freq);
 	Out.ar(out, sig ! 2);
 }).add;
 )
@@ -19,8 +21,8 @@ SynthDef(\sustain, { |freq = 440, amp = 1, attack = 0.1, decay = 1, out = 0, tim
 // connect to AOO server and join group
 (
 fork {
-	~playerID = 10000.rand;
-	~serverAddress = "localhost";
+	~playerID = 10000.rand; // can be your own name
+	~serverAddress = "localhost"; // replace by server IP
 	~groupName = "ensemble";
 	~serverPort = 8000;
 	~clientPort = 9014;
@@ -54,6 +56,12 @@ fork {
 Pdefn(\notes, Pseq([0, 5, 7, Rest(1), 2], inf));
 Pdefn(\durations, Pseq([1, 2, 1, 2, 2], inf));
 
+// initial pattern
+// params wrapped inside Pfunc, so they can be updated on the fly
+// and potentially mapped to a controller
+// alternatively, you can replace them by generative Pattern classes
+// e.g. Pwhite, Prand etc.
+
 ~pat = Pdefn(\pat, Pbind(
 	\instrument, Pfunc({ ~instrument }),
 	\scale, Pfunc({ ~scale }),
@@ -62,7 +70,7 @@ Pdefn(\durations, Pseq([1, 2, 1, 2, 2], inf));
 	\amp, Pfunc({ ~amp }),
 	\degree, Pdefn(\notes),
 	\dur, Pdefn(\durations),
-	\timeDur, Pfunc({ |ev| ~beatTimeDur * ~stretch * ev[\dur]})
+	\sustain, Pfunc({ |ev| ~beatTimeDur * ~stretch * ev[\dur]}) // don't change this
 ));
 
 ~updatePat = { ~stream = ~pat.asStream };
@@ -77,6 +85,7 @@ Pdefn(\durations, Pseq([1, 2, 1, 2, 2], inf));
 ~beatCounter = 0;
 ~currentDuration = 1;
 
+// function to process clock ticks
 ~clockEvent = { |beat, subdiv|
 	var event;
 	var clockVal = (beat * ~ppqn) + subdiv;
@@ -94,7 +103,7 @@ Pdefn(\durations, Pseq([1, 2, 1, 2, 2], inf));
 	};
 };
 
-
+// function to parse custom pattern notation
 ~setSeq = { |seq|
 	var split = seq.split($ );
 	var arr = split.collect( { |x| x.split($:)});
@@ -132,14 +141,18 @@ Pdefn(\durations, Pseq([1, 2, 1, 2, 2], inf));
 ~client.removeListener(\msg)
 
 
-// pattern stretch (augment / diminish - slow down / speed up)
-~stretch = 1
+// pattern stretch
+// (augment (stretch > 1) / diminish (stretch < 1))
+// (slow down / speed up)
+~stretch = 0.5
 
-// pattern phase shift
+// pattern phase shift in clock ticks
 ~shift = 14
 
+// custom pattern notation
 // set sequence (format: degree:duration, x = rest)
-// notes separated by commas = chord, e.g. 0,2,5:3
+// degrees separated by commas = chord
+// e.g. 0,2,5:3 -> chord [0,2,5] with duration 3 beats
 ~setSeq.("1:1 2:1 3:1")
 ~setSeq.("0:1 4:3 x:1 7:2 8,13:1")
 ~setSeq.("1,3:2 x:3 3:1 x:1")
@@ -147,6 +160,66 @@ Pdefn(\durations, Pseq([1, 2, 1, 2, 2], inf));
 ~setSeq.("0")
 ~setSeq.("0,2,5:4 3:4 2:1 4:2 0:1 7:4")
 
-~octave = 4
+// change octave
+~octave = 5
 
+// change instrument (any SynthDef)
 ~instrument = \sustain
+
+// change pattern, utlize generative Pattern classes
+// note that by replacing the params wrapped in Pfunc,
+// global variables like ~instrument, ~amp will no longer update the stream
+// and you have to reinitialize
+(
+~pat = Pdefn(\pat, Pbind(
+	// random instrument (SynthDef)
+	\instrument, Prand([\perc, \sustain], inf),
+
+	\scale, Pfunc({ ~scale }),
+	\root, Pfunc({ ~root }),
+	\octave, Pfunc({ ~octave }),
+
+	// repeating crescendo
+	\amp, Pn(Pgeom(0.05, 1.5, 16).clip(0, 1), inf),
+
+	// keep these, if you want to use the ~setSeq function
+	// or replace, if you want to use generative patterns
+	\degree, Pdefn(\notes),
+	\dur, Pdefn(\durations),
+	\sustain, Pfunc({ |ev| ~beatTimeDur * ~stretch * ev[\dur]}), // don't change this
+
+	/* you can add custom parameters for your own synth */
+));
+
+// this function has to be called to update the stream
+~updatePat.();
+)
+
+// alternatively, just change e.g. the degrees (Pdefn allows this)
+(
+Pdefn(\notes, Pwhite(0, 14, inf));
+~updatePat.();
+)
+(
+Pdefn(\durations, Prand([1, 2], inf));
+~updatePat.();
+)
+
+
+/* example of MIDI mapping */
+MIDIIn.connectAll
+
+// post incoming MIDI messages
+MIDIFunc.trace(true)
+MIDIFunc.trace(false)
+
+(
+MIDIdef.cc(\stretch, { |val, num|
+	// exponential mapping, use .linlin for linear
+	~stretch = val.linexp(0, 127, 0.1, 3);
+	"stretch: %".format(~stretch).postln;
+}, 77); // map to MIDI CC 77
+)
+
+// other interesting things to map could be:
+// ~shift, ~amp... or any synth parameters

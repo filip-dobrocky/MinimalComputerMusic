@@ -1,4 +1,4 @@
-#N canvas -14 20 1366 665 12;
+#N canvas 136 97 1024 481 12;
 #X declare -lib aoo;
 #X declare -lib aoo;
 #X obj 30 183 aoo_client 9011;
@@ -59,7 +59,7 @@
 #X obj 30 87 t s b;
 #X symbolatom 270 62 10 0 0 2 Username \$0-toUsername - 0;
 #X msg 270 117 group_join ensemble _ \$1 _;
-#N canvas 390 84 450 300 init 1;
+#N canvas 390 84 450 300 init 0;
 #X msg 24 99 120;
 #X obj 24 11 loadbang;
 #X obj 238 9 declare -lib aoo;

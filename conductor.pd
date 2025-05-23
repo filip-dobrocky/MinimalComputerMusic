@@ -1,4 +1,4 @@
-#N canvas 340 69 798 546 12;
+#N canvas 535 59 696 546 12;
 #X declare -lib aoo;
 #X obj 41 51 cnv 15 181 173 empty empty Tempo 20 12 0 14 #15c982 #5a5a5a 0;
 #X obj 126 95 vsl 37 84 1 666 0 0 empty \$0-toBpm BPM 0 -9 0 12 #e3dfd9 #5a5a5a #000000 0 1;
@@ -26,7 +26,7 @@
 #X restore 48 9 pd init;
 #X obj 239 52 cnv 15 347 204 empty empty Scale 20 12 0 14 #c98461 #5a5a5a 0;
 #X listbox 246 222 26 0 12 2 Degrees \$0-toDegrees \$0-degrees 16;
-#X floatatom 247 172 5 0 12 2 Root - \$0-root 16;
+#X floatatom 247 172 5 -12 12 2 Root - \$0-root 16;
 #X msg 354 66 ionian, f 7;
 #X msg 353 92 dorian, f 7;
 #X msg 353 118 phrygian, f 9;
