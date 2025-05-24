@@ -2,16 +2,16 @@ s.boot
 
 // example SynthDefs
 (
-SynthDef(\perc, { |freq = 440, amp = 1, attack = 0.01, decay = 1, out = 0|
+SynthDef(\perc, { |freq = 440, amp = 1, attackTime = 0.01, decayTime = 1, out = 0|
 	var env, sig;
-	env = EnvGen.ar(Env.perc(attack, decay), doneAction: 2);
+	env = EnvGen.ar(Env.perc(attackTime, decayTime), doneAction: 2);
 	sig = amp * env * 0.2 * SinOsc.ar(freq);
 	Out.ar(out, sig ! 2);
 }).add;
 
-SynthDef(\sustain, { |freq = 440, amp = 1, attack = 0.1, decay = 0.2, sustain = 0.7, release = 0.5, gate = 1, out = 0, timeDur = 1|
+SynthDef(\sustain, { |freq = 440, amp = 1, attackTime = 0.1, decayTime = 0.2, sustainLevel = 0.7, releaseTime = 0.5, gate = 1, out = 0, timeDur = 1|
 	var env, sig;
-	env = EnvGen.ar(Env.adsr(attack, decay, sustain, release), gate, doneAction: 2);
+	env = EnvGen.ar(Env.adsr(attackTime, decayTime, sustainLevel, releaseTime), gate, doneAction: 2);
 	sig = amp * env * 0.2 * LFTri.ar(freq);
 	Out.ar(out, sig ! 2);
 }).add;
@@ -53,8 +53,8 @@ fork {
 ~octave = 5;
 ~instrument = \perc;
 
-Pdefn(\notes, Pseq([0, 5, 7, Rest(1), 2], inf));
-Pdefn(\durations, Pseq([1, 2, 1, 2, 2], inf));
+Pdefn(\notes, 0);
+Pdefn(\durations, 1);
 
 // initial pattern
 // params wrapped inside Pfunc, so they can be updated on the fly
@@ -108,7 +108,7 @@ Pdefn(\durations, Pseq([1, 2, 1, 2, 2], inf));
 	var split = seq.split($ );
 	var arr = split.collect( { |x| x.split($:)});
 	var notes = arr.collect( { |x|
-		var chord = x[0].split($,);
+		var chord = x[0].split($-);
 		chord = chord.collect( { |note|
 			if (note.interpret.isNumber) {note.asInteger} {Rest()}
 		});
@@ -144,24 +144,24 @@ Pdefn(\durations, Pseq([1, 2, 1, 2, 2], inf));
 // pattern stretch
 // (augment (stretch > 1) / diminish (stretch < 1))
 // (slow down / speed up)
-~stretch = 0.5
+~stretch = 2
 
 // pattern phase shift in clock ticks
-~shift = 14
+~shift = 0
 
 // custom pattern notation
 // set sequence (format: degree:duration, x = rest)
-// degrees separated by commas = chord
-// e.g. 0,2,5:3 -> chord [0,2,5] with duration 3 beats
+// degrees separated by dashes = chord
+// e.g. 0-2-5:3 -> chord [0,2,5] with duration 3 beats
 ~setSeq.("1:1 2:1 3:1")
-~setSeq.("0:1 4:3 x:1 7:2 8,13:1")
-~setSeq.("1,3:2 x:3 3:1 x:1")
+~setSeq.("0:1 4:3 x:1 7:2 8-13:1")
+~setSeq.("1-3-2 x:3 3:1 x:1")
 ~setSeq.("x")
 ~setSeq.("0")
-~setSeq.("0,2,5:4 3:4 2:1 4:2 0:1 7:4")
+~setSeq.("0-2-5:4 3:4 2:1 4:2 0:1 7:4")
 
 // change octave
-~octave = 5
+~octave = 6
 
 // change instrument (any SynthDef)
 ~instrument = \sustain
@@ -205,6 +205,19 @@ Pdefn(\durations, Prand([1, 2], inf));
 ~updatePat.();
 )
 
+// reinitialize pattern
+(
+~pat = Pdefn(\pat, Pbind(
+	\instrument, Pfunc({ ~instrument }),
+	\scale, Pfunc({ ~scale }),
+	\root, Pfunc({ ~root }),
+	\octave, Pfunc({ ~octave }),
+	\amp, Pfunc({ ~amp }),
+	\degree, Pdefn(\notes),
+	\dur, Pdefn(\durations),
+	\sustain, Pfunc({ |ev| ~beatTimeDur * ~stretch * ev[\dur]}) // don't change this
+));
+)
 
 /* example of MIDI mapping */
 MIDIIn.connectAll
