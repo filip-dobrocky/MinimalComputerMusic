@@ -293,7 +293,7 @@
 #X obj 254 805 noteout;
 #X obj 305 478 r \$0-stretch;
 #X obj 401 479 r \$0-shift;
-#X text 96 56 pattern notation: degree:duration (multiple degrees = chord - 0-2-5) x (symbol) = rest;
+#X text 96 56 pattern notation: degree:duration (multiple degrees = chord - 0-2-5) x (symbol) = rest, f 25;
 #X connect 0 1 1 0;
 #X connect 1 0 2 0;
 #X connect 1 0 14 0;
