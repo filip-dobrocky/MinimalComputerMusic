@@ -24,7 +24,7 @@ fork {
 	~playerID = 10000.rand; // can be your own name
 	~serverAddress = "localhost"; // replace by server IP
 	~groupName = "ensemble";
-	~serverPort = 8000;
+	~serverPort = 8080;
 	~clientPort = 9014;
 	~client = AooClient(~clientPort);
 
