@@ -44,6 +44,7 @@ fork {
 }
 )
 
+~client.disconnect
 
 // initialize
 (
@@ -153,12 +154,19 @@ Pdefn(\durations, 1);
 // set sequence (format: degree:duration, x = rest)
 // degrees separated by dashes = chord
 // e.g. 0-2-5:3 -> chord [0,2,5] with duration 3 beats
+
+~setSeq.("0")
+~setSeq.("0-7")
 ~setSeq.("1:1 2:1 3:1")
+~setSeq.("0:2 3:1 2:1 5:2 7:1")
 ~setSeq.("0:1 4:3 x:1 7:2 8-13:1")
+~setSeq.("0:1 0:1 0:1 0:1 0:1 0:1 0:1 3-6:1")
+~setSeq.("0-3 x:3 3:1 x:1 2:1 2:1 3:2 6:3 6:1")
+~setSeq.("0-3-7:3 3:3 2:1 3:2 6:1 6:1 7:3 5:1")
 ~setSeq.("1-3-2 x:3 3:1 x:1")
 ~setSeq.("x")
-~setSeq.("0")
 ~setSeq.("0-2-5:4 3:4 2:1 4:2 0:1 7:4")
+
 
 // change octave
 ~octave = 6
@@ -171,7 +179,7 @@ Pdefn(\durations, 1);
 // global variables like ~instrument, ~amp will no longer update the stream
 // and you have to reinitialize
 (
-~pat = Pdefn(\pat, Pbind(
+~pat = Pdef(\pat, Pbind(
 	// random instrument (SynthDef)
 	\instrument, Prand([\perc, \sustain], inf),
 
@@ -207,7 +215,7 @@ Pdefn(\durations, Prand([1, 2], inf));
 
 // reinitialize pattern
 (
-~pat = Pdefn(\pat, Pbind(
+~pat = Pdef(\pat, Pbind(
 	\instrument, Pfunc({ ~instrument }),
 	\scale, Pfunc({ ~scale }),
 	\root, Pfunc({ ~root }),

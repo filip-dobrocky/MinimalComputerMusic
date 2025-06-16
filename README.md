@@ -4,6 +4,22 @@ MCM is a set of tools for Pd (vanilla) and SuperCollider which enables a non-hie
 
 It makes use of [AOO](https://git.iem.at/aoo/aoo) (Audio Over OSC) for group communication in a network, broadcasting information influencing global musical parameters and also a shared clock with timecode information. AOO is used because of its ability to reliably send and receive OSC messages, minimizing the effects of packet loss and timing differences. The audio streaming capabilities are not used, although the network group could be utilized also for this purpose.
 
+Quick start
+-----------
+1. Requires Pd and optionally SuperCollider. If you want to use SC and only play without conducting (controlling global parameters that affect the whole network), Pd is not needed.
+2. Requires AOO, see *Dependencies* at the bottom of the README
+3. Can be used with any instrument that accepts MIDI notes (the included synths as of now are just for testing purposes), options:
+    - use in Pd receive the symbol `mcm-midinote`, which gives a list in format `note velocity`
+    - in the SC `player` script, set the pattern key `\instrument` to a SynthDef with either a percussive envelope, or a gated envelope and argument `gate`
+    - use any other software with the Pd `player` patch and route MIDI between applications
+4. To test locally on your machine, run `clock.pd` and
+    - with Pd only, run `gui.pd`, open `conductor` and start the clock, open `player`, use the included `test_clock` (which is just a metronome for testing) or open `pd-midi-poly-synth/_main.pd` to hear the patterns
+        - include `mcm-midinote` in your custom synth
+        - or route the Pd MIDI output to another application
+    - with SC, run the `clock.pd` patch, open `conductor.pd` and start the clock, run the `player.scd` script and evaluate the individual code blocks
+        - modify the code to include your SynthDef in the patterns
+5. Explore further, adjust the code to your needs...
+
 Clock - `clock.pd`
 -----------------
 This is the patch that hosts the AOO server and also creates a client called `clock` which broadcasts timing messages of the following format:
