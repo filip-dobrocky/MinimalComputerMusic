@@ -1,3 +1,6 @@
 [submodule "MCM-SC"]
 	path = MCM-SC
 	url = https://github.com/filip-dobrocky/MCM-SC
+[submodule "sc/SCLOrkSynths"]
+	path = sc/SCLOrkSynths
+	url = https://github.com/SCLOrkHub/SCLOrkSynths.git

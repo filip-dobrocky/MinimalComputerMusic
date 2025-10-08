@@ -8,6 +8,7 @@
 Platform.userExtensionDir
 
 // define working directory (path to MinimalComputerMusic)
+// (you can drag and drop a directory from a file explorer)
 ~dir = "/run/media/filip/data/Projects/MinimalComputerMusic"
 
 // install MCM-SC Quark
@@ -29,9 +30,8 @@ s.boot
 
 c = MCMClock.new(groupName: "ensemble")
 
-// start/stop server
+// start the server
 c.start
-c.stop
 
 // start clock
 c.playing = true
@@ -55,6 +55,11 @@ SynthDef(\sustain, { |freq = 440, amp = 1, attackTime = 0.1, decayTime = 0.2, su
 	Out.ar(out, sig ! 2);
 }).add;
 )
+
+// or use ready-made synths from SCLOrkSynths (or modify them)
+this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/percussion/marimba1.scd")
+this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/percussion/kalimba.scd")
+this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/misc/beating.scd")
 
 // Initialize MCMPlayer
 (
@@ -103,7 +108,7 @@ p.setSequence("0-2-5:4 3:4 2:1 4:2 0:1 7:4")
 p.octave = 6
 
 // change instrument (any SynthDef)
-p.instrument = \perc
+p.instrument = \beating
 
 // change pattern, utlize generative Pattern classes
 p.instrument =  Prand([\perc, \sustain], inf);
@@ -148,6 +153,7 @@ MIDIdef.cc(\amp, { |val, num|
 (
 // A 2D slider (joystick) example
 w = Window("XY Pad - Shift / Amp", Rect(100, 100, 300, 300));
+w.background = Color.red;
 s = Slider2D(w, Rect(20, 20, 260, 260))
 .action_({ |sl|
 	p.shift = sl.x.linlin(0.0, 1.0, -24, 24);
