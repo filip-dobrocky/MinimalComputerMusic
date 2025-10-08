@@ -1,4 +1,4 @@
-Quarks.install("/run/media/filip/data/Projects/mcm-tools/sc-quark")
+Quarks.install("/run/media/filip/data/Projects/MinimalComputerMusic/sc-quark")
 
 Quarks.gui
 
