@@ -1,8 +1,8 @@
-#N canvas 249 74 652 488 12;
+#N canvas 6 826 470 218 12;
 #X declare -path libs -lib aoo;
 #X obj 20 563 aoo_client 9011;
 #X obj 19 592 route msg, f 14;
-#N canvas 574 95 537 481 parse_clock 0;
+#N canvas 1926 605 297 439 parse_clock 0;
 #X obj 78 132 oscparse;
 #X obj 78 81 list trim;
 #X obj 78 108 route osc;
@@ -31,7 +31,7 @@
 #X obj 20 467 t s b;
 #X symbolatom 260 442 10 0 0 2 Username \$0-toUsername - 0;
 #X msg 260 497 group_join ensemble _ \$1 _;
-#N canvas 85 163 1024 481 init 0;
+#N canvas 6 567 470 221 init 1;
 #X msg 26 99 120;
 #X obj 24 11 loadbang;
 #X obj 26 129 s \$0-toBpm;
@@ -49,6 +49,9 @@
 #X obj 238 9 declare -path libs -lib aoo;
 #X msg 4 162 1 0 5;
 #X msg 447 45 list 0-3-5:1 1:2 x:4;
+#X obj 455 151 loadbang;
+#X msg 455 179 24;
+#X obj 454 206 s \$0-ppqn;
 #X connect 0 0 2 0;
 #X connect 1 0 0 0;
 #X connect 1 0 4 0;
@@ -64,6 +67,8 @@
 #X connect 13 2 12 0;
 #X connect 15 0 13 0;
 #X connect 16 0 11 0;
+#X connect 17 0 18 0;
+#X connect 18 0 19 0;
 #X restore 502 -6 pd init;
 #X obj 260 467 makefilename player-%s;
 #N canvas 574 132 664 472 clock_event 0;
@@ -107,7 +112,7 @@
 #X connect 20 0 15 0;
 #X restore 19 688 pd clock_event;
 #X f 55;
-#N canvas 695 143 537 481 parse_info 0;
+#N canvas 1926 605 297 439 parse_info 0;
 #X obj 78 132 oscparse;
 #X obj 78 81 list trim;
 #X obj 78 108 route osc;

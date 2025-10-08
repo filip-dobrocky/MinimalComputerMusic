@@ -1,9 +1,9 @@
-#N canvas 702 149 303 304 12;
+#N canvas 2538 605 606 439 12;
 #X obj 9 136 cnv 20 250 120 empty empty Network\ config 20 12 0 12 #ff8300 #404040 0;
 #X symbolatom 22 183 20 0 0 2 Address \$0-sendaddr mcm-address 0;
 #X symbolatom 23 227 20 0 0 2 Username \$0-senduser mcm-username 0;
 #X obj 194 191 bng 40 250 50 0 \$0-sendconfig empty resend 0 -10 0 12 #fcfcfc #000000 #000000;
-#N canvas 104 110 450 300 send 0;
+#N canvas 2404 825 472 219 send 0;
 #X obj 18 18 r \$0-sendconfig;
 #X obj 18 74 s \$0-sendaddr;
 #X obj 119 74 s \$0-senduser;
