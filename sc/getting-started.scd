@@ -6,13 +6,15 @@
 Platform.userExtensionDir
 
 // define working directory (path to MinimalComputerMusic)
-~dir = "/run/media/filip/data/Projects/mcm-tools"
+~dir = "/run/media/filip/data/Projects/MinimalComputerMusic"
 
 // install MCM-SC Quark
 // Option 1 - install from local directory:
 Quarks.install(~dir +/+ "sc-quark")
 // Option 2 - install from GitHub (requires git installed)
 Quarks.install("https://github.com/filip-dobrocky/MCM-SC")
+
+
 
 // BOOT SC SERVER
 s.boot
