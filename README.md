@@ -6,21 +6,22 @@ It makes use of [AOO](https://git.iem.at/aoo/aoo) (Audio Over OSC) for group com
 
 Quick start
 -----------
-1. Requires Pd and optionally SuperCollider. If you want to use SC and only play without conducting (controlling global parameters that affect the whole network), Pd is not needed.
-2. Requires AOO, see *Dependencies* at the bottom of the README
-3. Can be used with any instrument that accepts MIDI notes (the included synths as of now are just for testing purposes), options:
-    - use in Pd receive the symbol `mcm-midinote`, which gives a list in format `note velocity`
-    - in the SC `player` script, set the pattern key `\instrument` to a SynthDef with either a percussive envelope, or a gated envelope and argument `gate`
+1. Requires AOO, see *Dependencies* at the bottom of the README
+2. Can be used with any instrument that accepts MIDI notes, options:
+    - to use in Pd, receive the symbol `mcm-midinote`, which gives a list in format `note velocity`
     - use any other software with the Pd `player` patch and route MIDI between applications
-4. To test locally on your machine, run `clock.pd` and
-    - with Pd only, run `gui.pd`, open `conductor` and start the clock, open `player`, use the included `test_clock` (which is just a metronome for testing) or open `pd-midi-poly-synth/_main.pd` to hear the patterns
-        - include `mcm-midinote` in your custom synth
-        - or route the Pd MIDI output to another application
-    - with SC, run the `clock.pd` patch, open `conductor.pd` and start the clock, run the `player.scd` script and evaluate the individual code blocks
-        - modify the code to include your SynthDef in the patterns
-5. Explore further, adjust the code to your needs...
+    - in an SC script, set `MCMPlayer.instrument` to a SynthDef with either a percussive envelope, or a gated envelope and argument `gate`
+3. To test locally on your machine:
+    - For SuperCollider:
+        - go through the `sc/getting-started.sc` script, everything is explained in the comments.
+    - For Pd:
+        - run `clock.pd` and
+        - run `gui.pd`, open `conductor` and start the clock, open `player`, use the included `test_clock` (which is just a metronome for testing) or open `pd-midi-poly-synth/_main.pd` to hear the patterns,
+        - include `mcm-midinote` in your custom synth,
+        - or route the Pd MIDI output to another application.
+4. Explore further, adjust the code to your needs...
 
-Clock - `clock.pd`
+Clock - `clock.pd` / `MCMClock (MCM-SC)`
 -----------------
 This is the patch that hosts the AOO server and also creates a client called `clock` which broadcasts timing messages of the following format:
 - `/clock/pulse [beat] [subdiv]`,  
@@ -37,7 +38,7 @@ This is the patch that hosts the AOO server and also creates a client called `cl
 
  There should be only one instance of the `clock.pd` patch running on the network, and every client connects to the server, which hosts this patch.
 
- Conductor - `conductor.pd`
+ Conductor - `conductor.pd` / `MCMConductor (MCM-SC)`
  -------------------------
  The word conductor is not used in the traditional sense, where one conductor directs the whole ensemble. On the other hand, everyone in the ensemble can also be a conductor (hence "non-hierarchichal") and control global musical parameters like tempo and mode.
 
@@ -49,7 +50,7 @@ This is the patch that hosts the AOO server and also creates a client called `cl
  where `degrees` is a variable-sized list of `float`s which indicate the relative intervals in semitones from the root of the scale (micro-intervals allowed)
  - change the root note of the scale: `/scale/root [root]`.
 
- Player (Pd and SC)
+ Player - `player.pd` / `MCMPlayer (MCM-SC)`
  ------------------
  A player receives the clock (and tempo + scale information) and plays their own patterns on their own instruments. Both the Pure Data and SuperCollider versions employ a custom pattern notation in the following format:
  ```
