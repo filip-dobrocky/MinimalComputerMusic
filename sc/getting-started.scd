@@ -1,3 +1,5 @@
+// run line / code block by Ctrl+Enter / Cmd+Enter
+
 // ======= DEPENDENCIES =======
 
 // Download AOO at
@@ -10,10 +12,13 @@ Platform.userExtensionDir
 
 // install MCM-SC Quark
 // Option 1 - install from local directory:
-Quarks.install(~dir +/+ "sc-quark")
+Quarks.install(~dir +/+ "MCM-SC")
 // Option 2 - install from GitHub (requires git installed)
-Quarks.install("https://github.com/filip-dobrocky/MCM-SC")
+// Quarks.install("https://github.com/filip-dobrocky/MCM-SC")
 
+// After installing the Quark, recompile the class library
+// Language -> Recompile Class Library
+// (Ctrl + Shift + L)
 
 
 // BOOT SC SERVER
@@ -23,6 +28,7 @@ s.boot
 // ======= CLOCK =======
 
 c = MCMClock.new(groupName: "ensemble")
+
 // start/stop server
 c.start
 c.stop
@@ -33,7 +39,7 @@ c.playing = true
 
 // ======= PLAYER =======
 
-// example SynthDefs
+// simple example SynthDefs - you can use them as a template to create your own
 (
 SynthDef(\perc, { |freq = 440, amp = 1, attackTime = 0.01, decayTime = 1, out = 0|
 	var env, sig;
@@ -50,13 +56,12 @@ SynthDef(\sustain, { |freq = 440, amp = 1, attackTime = 0.1, decayTime = 0.2, su
 }).add;
 )
 
-
 // Initialize MCMPlayer
 (
 p = MCMPlayer.new(
 	playerID: 10000.rand, // can be replaced by username - e.g. "MyName"
-    serverAddress: "localhost",
-    groupName: "ensemble"
+	serverAddress: "localhost",
+	groupName: "ensemble"
 );
 )
 
@@ -71,7 +76,7 @@ p.start
 // pattern stretch
 // (augment (stretch > 1) / diminish (stretch < 1))
 // (slow down / speed up)
-p.stretch = 0.5
+p.stretch = 0.25
 
 // pattern phase shift in clock ticks
 p.shift = 0
@@ -122,18 +127,51 @@ MIDIFunc.trace(false)
 MIDIdef.cc(\stretch, { |val, num|
 	// exponential mapping, use .linlin for linear
 	p.stretch = val.linexp(0, 127, 0.1, 3);
-	"stretch: %".format(~stretch).postln;
+	"stretch: %".format(p.stretch).postln;
 }, 77); // map to MIDI CC 77
 )
 
 // other interesting things to map could be:
-// ~shift, ~amp... or any synth parameters
+// p.shift, p.amp...
+// ...or any synth parameters - p.setParam(\attack, val.linlin(0, 127, 0.0, 1.0))
 
+(
+MIDIdef.cc(\amp, { |val, num|
+	// exponential mapping, use .linlin for linear
+	p.amp = val.linexp(0, 127, 0.0005, 1).thresh(0.00051);
+	"amp: %".format(p.amp).postln;
+}, 78); // map to MIDI CC 77
+)
+
+
+// ... or use GUI
+(
+// A 2D slider (joystick) example
+w = Window("XY Pad - Shift / Amp", Rect(100, 100, 300, 300));
+s = Slider2D(w, Rect(20, 20, 260, 260))
+.action_({ |sl|
+	p.shift = sl.x.linlin(0.0, 1.0, -24, 24);
+	p.amp = sl.y ** 2;
+	("x - shift:" + p.shift + " y - amp:" + p.amp).postln;
+});
+w.front;
+)
 
 // ======= CONDUCTOR =======
-k = MCMConductor.new("filip", "localhost", "ensemble")
+k = MCMConductor.new("user", "localhost", "ensemble")
 k.connect
+
 k.stopClock
 k.startClock
-k.setScale(Scale.partch_o6)
-k.setRoot(-12)
+
+Scale.directory // see available scales
+k.setScale(Scale.partch_o6) // set scale
+// or build your own - e.g. 24T equal temperament
+k.setScale(Scale([ 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5 ]))
+// equivalent of
+k.setScale(Scale(Array.series(24, 0, 0.5)))
+
+k.setRoot(-7) // shift global root note by semitones
+
+k.setTempo(666) // set global tempo in BPM
+
