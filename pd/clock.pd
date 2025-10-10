@@ -1,6 +1,6 @@
-#N canvas 86 94 715 577 12;
+#N canvas 982 138 715 577 12;
 #X declare -path libs -lib aoo;
-#N canvas 756 83 483 503 clock 0;
+#N canvas 1213 172 483 503 clock 1;
 #X obj 69 218 int 0;
 #X obj 125 219 + 1;
 #X msg 12 173 0;
@@ -22,6 +22,8 @@
 #X obj 69 392 int;
 #X obj 287 421 sel 0;
 #X obj 287 473 outlet;
+#X obj 82 40 loadbang;
+#X msg 82 68 120;
 #X connect 0 0 1 0;
 #X connect 0 0 6 0;
 #X connect 0 0 3 0;
@@ -49,6 +51,8 @@
 #X connect 17 1 19 0;
 #X connect 18 0 8 0;
 #X connect 19 0 20 0;
+#X connect 21 0 22 0;
+#X connect 22 0 13 0;
 #X restore 181 448 pd clock;
 #X f 22;
 #X obj 236 334 route tempo;

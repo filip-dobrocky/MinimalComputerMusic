@@ -1,4 +1,4 @@
-#N canvas 456 0 455 715 12;
+#N canvas 907 40 635 558 12;
 #X declare -path libs -lib aoo;
 #X obj 41 51 cnv 15 181 173 empty empty Tempo 20 12 0 14 #66b066 #5a5a5a 0;
 #X obj 126 95 vsl 37 84 1 666 0 0 empty \$0-toBpm BPM 0 -9 0 12 #e3dfd9 #5a5a5a #000000 0 1;
@@ -28,7 +28,7 @@
 #X obj 354 9 loadbang;
 #X obj 50 484 aoo_client 9020;
 #X obj 354 196 s \$0-scalePreset;
-#N canvas 201 151 455 715 osc_send 1;
+#N canvas 201 151 455 715 osc_send 0;
 #X obj 200 159 oscformat tempo bpm;
 #X obj 501 160 oscformat scale degrees;
 #X obj 346 160 oscformat scale root;
@@ -103,7 +103,7 @@
 #X connect 10 0 12 0;
 #X connect 11 0 0 0;
 #X restore 149 9 pd scale_presets;
-#N canvas 228 0 228 683 receive_params 1;
+#N canvas 228 0 370 162 receive_params 0;
 #X obj 146 25 r mcm-username;
 #X obj 33 25 r mcm-address;
 #X obj 33 73 s \$0-toAddress;
