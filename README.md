@@ -17,7 +17,7 @@ Quick start
     - For Pd:
         - run `clock.pd` and
         - run `gui.pd`, open `conductor` and start the clock, open `player`, use the included `test_clock` (which is just a metronome for testing) or open `pd-midi-poly-synth/_main.pd` to hear the patterns,
-        - include `mcm-midinote` in your custom synth,
+        - include `r mcm-midinote` in your custom synth,
         - or route the Pd MIDI output to another application.
 4. Explore further, adjust the code to your needs...
 
