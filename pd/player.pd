@@ -1,4 +1,4 @@
-#N canvas 575 46 759 457 12;
+#N canvas -55 310 604 645 12;
 #X declare -path libs -lib aoo;
 #X obj 20 563 aoo_client 9011;
 #X obj 19 592 route msg, f 14;
@@ -307,6 +307,9 @@
 #X msg 44 192 0:1;
 #X msg 44 215 0-7:1;
 #X obj 19 346 list;
+#X msg 260 593 port \$1;
+#X obj 260 543 r mcm-player-port;
+#X obj 260 568 f;
 #X connect 0 1 1 0;
 #X connect 1 0 2 0;
 #X connect 1 0 12 0;
@@ -353,3 +356,6 @@
 #X connect 52 0 54 0;
 #X connect 53 0 54 0;
 #X connect 54 0 51 0;
+#X connect 55 0 0 0;
+#X connect 56 0 57 0;
+#X connect 57 0 55 0;

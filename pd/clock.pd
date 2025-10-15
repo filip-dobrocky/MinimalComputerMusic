@@ -1,6 +1,6 @@
-#N canvas 982 138 715 577 12;
+#N canvas 964 52 950 477 12;
 #X declare -path libs -lib aoo;
-#N canvas 1213 172 483 503 clock 1;
+#N canvas 964 52 472 477 clock 0;
 #X obj 69 218 int 0;
 #X obj 125 219 + 1;
 #X msg 12 173 0;
