@@ -1,0 +1,40 @@
+name: Release with submodules
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write  # Needed to upload assets to the release
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get release info
+        id: vars
+        run: |
+          echo "repo_name=${GITHUB_REPOSITORY##*/}" >> $GITHUB_OUTPUT
+          echo "tag_name=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Create release ZIP (including submodules)
+        run: |
+          zip_name="${{ steps.vars.outputs.repo_name }}-${{ steps.vars.outputs.tag_name }}.zip"
+          echo "Creating $zip_name"
+          zip -r "$zip_name" . -x '*.git*'
+          echo "zip_name=$zip_name" >> $GITHUB_OUTPUT
+        id: create_zip
+
+      - name: Upload ZIP as release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.create_zip.outputs.zip_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
