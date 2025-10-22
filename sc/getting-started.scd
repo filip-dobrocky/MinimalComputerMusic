@@ -58,33 +58,35 @@ SynthDef(\sustain, { |freq = 440, amp = 1, attackTime = 0.1, decayTime = 0.2, su
 )
 
 // or use ready-made synths from SCLOrkSynths (or modify them)
-this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/percussion/marimba1.scd")
-this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/percussion/kalimba.scd")
-this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/misc/beating.scd")
-this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/guitar/distortedGuitar.scd")
-this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/guitar/modalElectricGuitar.scd")
+this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/percussion/marimba1.scd");
+this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/percussion/kalimba.scd");
+this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/misc/beating.scd");
+this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/guitar/distortedGuitar.scd");
+this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/guitar/modalElectricGuitar.scd");
+this.executeFile(~dir +/+ "sc/SCLOrkSynths/SynthDefs/drums/neurosnare.scd");
 
 // Initialize MCMPlayer
 (
 p = MCMPlayer.new(
-	playerID: "filip", // can be replaced by username - e.g. "MyName"
-	serverAddress: "192.168.0.45",
-	groupName: "ensemble"
+	playerID: "filip222", // can be replaced by username - e.g. "MyName"
+	serverAddress: "localhost",
+	groupName: "ensemble",
+	clientPort: 9020
 );
 )
 
 
 // Connect to the server
 p.connect
+p.disconnect
 
 // Start listening
 p.start
 
-
 // pattern stretch
 // (augment (stretch > 1) / diminish (stretch < 1))
 // (slow down / speed up)
-p.stretch = 0.5
+p.stretch = 0.33
 
 // pattern phase shift in clock ticks
 p.shift = 0
@@ -94,10 +96,10 @@ p.shift = 0
 // degrees separated by dashes = chord
 // e.g. 0-2-5:3 -> chord [0,2,5] with duration 3 beats
 
-p.setSequence("1")
+p.setSequence("-12")
 p.setSequence("0-5-7")
 p.setSequence("1:2 2:1 3:1")
-p.setSequence("0:2 3:1 2:1 5:2 7:1")
+p.setSequence("0:2 3:1 2:1 5:2 7:1 0:2 3:1 4:1 5:2 7:1")
 p.setSequence("0:1 4:3 x:1 7:2 8-13:1")
 p.setSequence("0:1 0:1 0:1 0:1 0:1 0:1 0:1 3-6:1")
 p.setSequence("0-3 x:3 3:1 x:1 2:1 2:1 3:2 6:3 6:1")
@@ -111,10 +113,10 @@ p.setSequence("0-2-5:4 3:4 2:1 4:2 0:1 7:4")
 p.octave = 6
 
 // change instrument (any SynthDef)
-p.instrument = \marimba1
+p.instrument = \kalimba
 p.instrument = \distortedGuitar
 p.instrument = \modalElectricGuitar
-p.instrument = \
+p.instrument = \neuroSnare
 p.instrument = Prand([\marimba1, \kalimba, \beating], inf)
 p.instrument = Pseq([\marimba1, \kalimba, \beating], inf)
 
@@ -128,6 +130,8 @@ p.degrees =  Pwhite(0, 14, inf)
 p.durations = Prand([1, 2], inf)
 
 p.setParam(\dec, 0.1)
+p.setParam(\out, 0)
+p.setParam(\midiout, 0)
 
 
 // ======= MIDI MAPPING =======
@@ -142,7 +146,7 @@ MIDIdef.cc(\stretch, { |val, num|
 	// exponential mapping, use .linlin for linear
 	p.stretch = val.linexp(0, 127, 0.1, 3);
 	"stretch: %".format(p.stretch).postln;
-}, 77); // map to MIDI CC 77
+}, 78); // map to MIDI CC 77
 )
 
 // other interesting things to map could be:
@@ -154,16 +158,17 @@ MIDIdef.cc(\amp, { |val, num|
 	// exponential mapping, use .linlin for linear
 	p.amp = val.linexp(0, 127, 0.0005, 1).thresh(0.00051);
 	"amp: %".format(p.amp).postln;
-}, 78); // map to MIDI CC 77
+}, 77); // map to MIDI CC 77
 )
 
-
+s = Server.default
 // ... or use GUI
 (
+var sl;
 // A 2D slider (joystick) example
 w = Window("XY Pad - Shift / Amp", Rect(100, 100, 300, 300));
 w.background = Color.red;
-s = Slider2D(w, Rect(20, 20, 260, 260))
+sl = Slider2D(w, Rect(20, 20, 260, 260))
 .action_({ |sl|
 	p.shift = sl.x.linlin(0.0, 1.0, -24, 24);
 	p.amp = sl.y ** 2;
@@ -180,13 +185,22 @@ k.stopClock
 k.startClock
 
 Scale.directory // see available scales
-k.setScale(Scale.ionian) // set scale
+k.setScale(Scale.aeolian) // set scale
+k.setScale(Scale.indian) // set scale
 // or build your own - e.g. 24T equal temperament
 k.setScale(Scale([ 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5 ]))
 // equivalent of
-k.setScale(Scale(Array.series(24, 0, 0.5)))
+k.setScale(Scale(Array.series(48, 0, 0.25)))
 
-k.setRoot(-7) // shift global root note by semitones
+k.setRoot(5) // shift global root note by semitones
 
-k.setTempo(120) // set global tempo in BPM
+k.setTempo(666) // set global tempo in BPM
 
+
+(
+MIDIdef.cc(\amp, { |val, num|
+	// exponential mapping, use .linlin for linear
+	p.amp = val.linexp(0, 127, 0.0005, 1).thresh(0.00051);
+	"amp: %".format(p.amp).postln;
+}, 77); // map to MIDI CC 77
+)
