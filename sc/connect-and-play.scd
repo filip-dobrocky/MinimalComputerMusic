@@ -5,7 +5,7 @@
 // ~dir = "/run/media/data/Projects/MinimalComputerMusic";
 
 s.waitForBoot({
-	MCMConfig.serverAddress = "192.168.1.102";
+	MCMConfig.serverAddress = "192.168.1.202";
 	MCMConfig.username = "filip";
 
 	s.sync;
@@ -35,16 +35,16 @@ MIDIClient.init;
 ~midiOut = MIDIOut.newByName("loopMIDI Port", "loopMIDI Port").latency_(Server.default.latency);
 p.setParam(\type, \midi);
 p.setParam(\midiout, ~midiOut);
-p.setParam(\sustain, 0.8);
+p.setParam(\sustain, 0.6);
 )
 
 
 
 // mess around...
-p.octave = 6
+p.octave = 4
 
 p.setSequence("0")
-p.setSequence("0-5-7")
+p.setSequence("0-5-7-9")
 p.setSequence("1:2 2:1 3:1")
 p.setSequence("0:2 3:1 2:1 5:2 7:1 0:2 3:1 4:1 5:2 7:1")
 p.setSequence("0:1 4:3 x:1 7:2 8-13:1")
@@ -57,8 +57,11 @@ p.setSequence("0-2-5:4 3:4 2:1 4:2 0:1 7:4")
 
 p.instrument = \default
 
+p.shift = 0
+p.stretch = 0.25
 
 p.amp = Pexprand(0.85, 1.0, inf)
+p.amp = 1
 
 
 // ===================================
@@ -66,12 +69,13 @@ p.amp = Pexprand(0.85, 1.0, inf)
 
 Scale.directory // see available scales
 k.setScale(Scale.aeolian) // set scale
+k.setScale(Scale.partch_u6) // set scale
 k.setScale(Scale.indian) // set scale
 // or build your own - e.g. 24T equal temperament
 k.setScale(Scale([ 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0, 10.5, 11.0, 11.5 ]))
 // equivalent of
 k.setScale(Scale(Array.series(48, 0, 0.25)))
 
-k.setRoot(-0) // shift global root note by semitones
+k.setRoot(5) // shift global root note by semitones
 
-k.setTempo(666) // set global tempo in BPM
+k.setTempo(66) // set global tempo in BPM

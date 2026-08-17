@@ -40,7 +40,7 @@ This is the patch that hosts the AOO server and also creates a client called `cl
 
  Conductor - `conductor.pd` / `MCMConductor (MCM-SC)`
  -------------------------
- The word conductor is not used in the traditional sense, where one conductor directs the whole ensemble. On the other hand, everyone in the ensemble can also be a conductor (hence "non-hierarchichal") and control global musical parameters like tempo and mode.
+ The word conductor is not used in the traditional sense, where one conductor directs the whole ensemble. On the other hand, everyone in the ensemble can also be a conductor (hence "non-hierarchichal") and control global musical parameters like tempo and mode. This includes players running TidalCycles - see *Tidal* below.
 
  A conductor can:
 
@@ -74,6 +74,51 @@ There is also a possibility to *stretch* and *shift* the pattern, which are tech
 
  The Pd version outputs MIDI `NoteOn / NoteOff` data via the send `mcm-midinote` (so you can receive it in another patch with your synth) and also `noteout` to the output MIDI port.
 
+Mini-notation (SuperCollider only)
+----------------------------------
+The SuperCollider player also accepts [Tidal mini-notation](https://tidalcycles.org/docs/reference/mini_notation/),
+via the [Pmini](https://github.com/j0py/Pmini) quark:
+
+```supercollider
+p.setMini("0 [2 4] <7 9>*2 ~")
+```
+
+The values are still scale degrees, so the conductor's scale and root apply exactly as
+they do to the MCM notation - mini-notation only changes the rhythmic structure. One
+cycle lasts 4 beats by default (`p.cycleBeats`). Chords are written as Tidal stacks,
+`"[0,2,5]"`, rather than MCM's `0-2-5`.
+
+Pd players stay on the `degree:duration` notation. They interoperate as before: the
+clock, tempo and scale are shared regardless of what notation anyone is writing in.
+
+Tidal
+-----
+TidalCycles can play as a member of the ensemble, taking its clock, scale and root from
+whoever is conducting, and playing through its own SuperDirt as usual.
+
+`MCMLink` mirrors the shared clock into an [Ableton Link](https://www.ableton.com/en/link/)
+session, which Tidal follows, and forwards the conductor's scale and root to Tidal's OSC
+control input. Link discovers peers on loopback, so each musician runs their own bridge
+locally - the ensemble still spans the network over AOO as before.
+
+Run `sc/tidal-and-play.scd` on the SuperCollider side, and boot Tidal with
+`tidal/BootTidal.hs` from this repo. Then, in Tidal:
+
+```haskell
+d1 $ note (mcm "0 [2 4] <7 9>*2 ~") # s "superpiano"
+```
+
+`mcm` turns scale degrees into notes using the ensemble's current scale and root,
+micro-intervals included. Tidal can conduct too - `mcmPlay`, `mcmStop`, `mcmBpm 90`,
+`mcmSetScale [0,2,3,5,7,8,10]`, `mcmSetRoot 5` - and `setcps` is an ensemble tempo
+change rather than a local one, because tempo travels over Link in both directions.
+
  Dependencies
  ------------
  The only dependency is **AOO**. You can install it in Pd via Deken (`Help -> Find Externals`) and in SuperCollider by downloading the latest [release](https://git.iem.at/aoo/aoo/-/releases) for your system and copying the SC version to your `Extensions` folder.
+
+ For mini-notation in SuperCollider, also install the **Pmini** quark:
+ `Quarks.install("https://github.com/j0py/Pmini")`.
+
+ For the Tidal integration, **TidalCycles 1.9+** (which bundles Ableton Link) and
+ **SuperDirt**. Nothing else in MCM depends on it.
