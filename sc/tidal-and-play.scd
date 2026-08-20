@@ -33,6 +33,8 @@ s.waitForBoot({
 )
 
 
+l.link.numPeers
+
 // In Tidal, degrees go through `mcm` so the ensemble's scale and root apply:
 //
 //   d1 $ note (mcm "0 [2 4] <7 9>*2 ~") # s "superpiano"
@@ -41,7 +43,8 @@ s.waitForBoot({
 
 // Conduct from SuperCollider...
 k.startClock
-k.setTempo(66)
+k.stopClock
+k.setTempo(128)
 k.setScale(Scale.aeolian)
 k.setRoot(5)
 k.setScale(Scale(Array.series(48, 0, 0.25))) // 24T - Tidal gets fractional notes

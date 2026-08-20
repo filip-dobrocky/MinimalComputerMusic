@@ -17,8 +17,9 @@
 
 import Sound.Tidal.Boot
 
--- Tidal defines its own <* and *> (structure from the left / right operand)
-import Prelude hiding ((<*), (*>))
+-- Tidal defines its own <* and *> (structure from the left / right operand), and
+-- `all` (apply a function to every pattern).
+import Prelude hiding (all, (<*), (*>))
 
 -- hosc >= 0.20. On older hosc these are Sound.OSC.FD / Sound.OSC.Transport.FD.UDP.
 import qualified Sound.Osc.Fd as O
@@ -52,6 +53,19 @@ let mcmDegrees = (map read . words) <$> cS "0 2 4 5 7 9 11" "mcmscale" :: Patter
     -- <* keeps the structure coming from the note pattern, not from the controls
     mcm p = (\d ds r -> realToFrac (mcmDeg ds d + r)) <$> p <* mcmDegrees <* mcmRoot
 :}
+
+
+-- Ensemble transport ---------------------------------------------------------
+-- Link carries tempo and phase but no transport, so the conductor's start/stop
+-- arrives as a control instead, and gates every pattern. Defaults to playing, so
+-- Tidal on its own (no MCMLink) behaves as usual.
+
+:{
+let mcmPlaying = (> 0) <$> cF 1 "mcmplaying"
+    mcmGate = mask mcmPlaying
+:}
+
+all mcmGate
 
 
 -- Conducting -----------------------------------------------------------------

@@ -108,6 +108,10 @@ Run `sc/tidal-and-play.scd` on the SuperCollider side, and boot Tidal with
 d1 $ note (mcm "0 [2 4] <7 9>*2 ~") # s "superpiano"
 ```
 
+Starting and stopping the clock silences and revives Tidal's patterns along with the
+rest of the ensemble - Link carries no transport, so the boot file gates every pattern
+on the conductor's play state.
+
 `mcm` turns scale degrees into notes using the ensemble's current scale and root,
 micro-intervals included. Tidal can conduct too - `mcmPlay`, `mcmStop`, `mcmBpm 90`,
 `mcmSetScale [0,2,3,5,7,8,10]`, `mcmSetRoot 5` - and `setcps` is an ensemble tempo
